@@ -1,0 +1,35 @@
+# Django and Django REST Framework
+Django==4.2.10
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+django-filter==23.5
+django-environ==0.11.2
+
+# Database
+psycopg2-binary==2.9.9
+
+# Authentication
+djangorestframework-simplejwt==5.3.1
+
+# Payment Processing
+stripe==7.13.0
+paypalrestsdk==1.13.1
+
+# Task Queue
+celery==5.3.6
+redis==5.0.2
+
+# Email
+django-anymail==10.2
+
+# API Documentation
+drf-yasg==1.21.7
+
+# Development and Security
+django-debug-toolbar==4.2.0
+python-dotenv==1.0.1
+gunicorn==21.2.0
+
+# Utilities
+Pillow==10.2.0
+requests==2.31.0

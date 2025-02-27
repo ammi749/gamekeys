@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order Confirmation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+        }
+        .logo {
+            max-width: 150px;
+            height: auto;
+        }
+        .order-info {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .order-details {
+            margin-bottom: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th {
+            background-color: #f2f2f2;
+            text-align: left;
+            padding: 10px;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .keys {
+            background-color: #f0f7ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .key-code {
+            font-family: monospace;
+            background-color: #eee;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #777;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="{{ site_url }}/static/images/logo.png" alt="{{ site_name }}" class="logo">
+        <h1>Thank You For Your Purchase!</h1>
+    </div>
+    
+    <div class="order-info">
+        <h2>Order Information</h2>
+        <p><strong>Order ID:</strong> {{ order.id }}</p>
+        <p><strong>Date:</strong> {{ order.created_at|date:"F j, Y, g:i a" }}</p>
+        <p><strong>Email:</strong> {{ order.email }}</p>
+        <p><strong>Payment Method:</strong> {{ order.get_payment_method_display }}</p>
+        {% if order.cashback_earned > 0 and not order.is_guest %}
+            <p><strong>Cashback Earned:</strong> ${{ order.cashback_earned }}</p>
+        {% endif %}
+    </div>
+    
+    <div class="order-details">
+        <h2>Order Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Platform</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td>{{ item.product.name }}</td>
+                    <td>{{ item.product.platform.name }}</td>
+                    <td>${{ item.price }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                {% if order.cashback_used > 0 %}
+                <tr>
+                    <td colspan="2" align="right"><strong>Subtotal:</strong></td>
+                    <td>${{ order.subtotal }}</td>
+                </tr>
+                <tr>
+                    <td colspan="2" align="right"><strong>Cashback Applied:</strong></td>
+                    <td>-${{ order.cashback_used }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td colspan="2" align="right"><strong>Total:</strong></td>
+                    <td>${{ order.total }}</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    
+    <div class="keys">
+        <h2>Your Digital Keys</h2>
+        <p>Below are your purchased product keys. Please keep this email for your records.</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Key</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key in keys %}
+                <tr>
+                    <td>{{ key.product.name }}</td>
+                    <td class="key-code">{{ key.key_code }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <h3>How to Redeem Your Keys</h3>
+        <ol>
+            {% for key in keys %}
+                <li>
+                    <strong>{{ key.product.name }} ({{ key.product.platform.name }}):</strong>
+                    <ul>
+                        {% if key.product.platform.slug == 'steam' %}
+                            <li>Open the Steam client and log in to your account</li>
+                            <li>Click on "Games" in the top menu</li>
+                            <li>Select "Activate a Product on Steam..."</li>
+                            <li>Follow the prompts and enter your key when requested</li>
+                        {% elif key.product.platform.slug == 'epic-games' %}
+                            <li>Log in to your Epic Games account</li>
+                            <li>Click on your username in the top-right corner</li>
+                            <li>Select "Redeem Code" from the dropdown menu</li>
+                            <li>Enter your key and click "Redeem"</li>
+                        {% elif key.product.platform.slug == 'origin' %}
+                            <li>Open the Origin client and log in to your account</li>
+                            <li>Click on "Origin" in the top menu</li>
+                            <li>Select "Redeem Product Code..."</li>
+                            <li>Enter your key and click "Next"</li>
+                        {% else %}
+                            <li>Visit the {{ key.product.platform.name }} website and log in to your account</li>
+                            <li>Look for a "Redeem Code" or similar option</li>
+                            <li>Enter your key according to the platform's instructions</li>
+                        {% endif %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ol>
+    </div>
+    
+    <div class="footer">
+        <p>If you have any questions about your order, please contact our support team at support@{{ site_url|cut:"http://"|cut:"https://" }}</p>
+        <p>© {{ site_name }} {% now "Y" %}</p>
+    </div>
+</body>
+</html>
